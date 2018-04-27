@@ -2,7 +2,7 @@
   <div class="hello mt-3">
     <ul class="list-unstyled">
       <li v-for="post in posts" class="media m-3">
-        <img class="mr-3" :src="post.data.thumbnail" alt="Generic placeholder image">
+        <img v-if="post.data.thumbnail != 'self'" class="mr-3" :src="post.data.thumbnail">
         <div class="media-body">
           <h5 class="mt-0 mb-1"><a :href="createUrl(post.data.permalink)" target="_blank">{{post.data.title}}</a></h5>
           <p>
@@ -17,7 +17,7 @@
               {{post.showImage ? 'Hide' : 'Show'}} Image
             </button>
             <div v-if="post.showImage">
-              <img :src="post.data.url" alt="">
+              <img class="post-image" :src="post.data.url" alt="">
             </div>
           </p>
         </div>
@@ -36,12 +36,17 @@ export default {
       posts: [],
     };
   },
+  watch: {
+    ['$route.params.subreddit']() {
+      this.load(this.$route.params.subreddit);
+    }
+  },
   mounted() {
-    this.load();
+    this.load(this.$route.params.subreddit);
   },
   methods: {
-    load() {
-      const url = 'https://www.reddit.com/r/rarepuppers/.json';
+    load(subreddit) {
+      const url = `https://www.reddit.com/r/${subreddit}/.json`;
       fetch(url)
         .then(response => response.json())
         .then((result) => {
@@ -66,4 +71,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.post-image {
+  width: 100%;
+  height: auto;
+}
 </style>
