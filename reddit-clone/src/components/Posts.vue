@@ -27,35 +27,22 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex';
 import {parse, distanceInWords} from 'date-fns';
 
 export default {
   name: 'Posts',
-  data() {
-    return {
-      posts: [],
-    };
-  },
   watch: {
     ['$route.params.subreddit']() {
       this.load(this.$route.params.subreddit);
     }
   },
+  computed: mapState(['posts']),
   mounted() {
     this.load(this.$route.params.subreddit);
   },
   methods: {
-    load(subreddit) {
-      const url = `https://www.reddit.com/r/${subreddit}/.json`;
-      fetch(url)
-        .then(response => response.json())
-        .then((result) => {
-          result.data.children.forEach(child => {
-            child.showImage = false;
-          });
-          this.posts = result.data.children;
-        });
-    },
+    ...mapActions(['load']),
     formatDate(date) {
       return distanceInWords(parse(date * 1000), new Date());
     },
